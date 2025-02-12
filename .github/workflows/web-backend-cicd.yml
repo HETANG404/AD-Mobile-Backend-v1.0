@@ -51,6 +51,7 @@ jobs:
         with:
           name: dependency-check-report
           path: target/dependency-check-report.html
+                target/dependency-check-report/dependency-check-report.html
 
       - name: Fail on High Vulnerabilities
         run: |
