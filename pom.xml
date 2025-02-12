@@ -204,54 +204,54 @@
             </plugin>
 
 
+        <!-- SpotBugs Plugin -->
+        <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>4.8.3.0</version>
+            <executions>
+                <execution>
+                    <phase>verify</phase>  <!-- 添加执行阶段 -->
+                    <goals>
+                        <goal>check</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <effort>Max</effort>
+                <threshold>High</threshold>
+                <xmlOutput>true</xmlOutput>
+                <outputDirectory>target</outputDirectory>
+                <plugins>
+                    <plugin>
+                        <groupId>com.h3xstream.findsecbugs</groupId>
+                        <artifactId>findsecbugs-plugin</artifactId>
+                        <version>1.13.0</version>
+                    </plugin>
+                </plugins>
+            </configuration>
+        </plugin>
 
-            <!-- SpotBugs Plugin -->
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.8.3.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal> <!-- 执行 SpotBugs 检查 -->
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <effort>Max</effort> <!-- 设置分析力度为最大 -->
-                    <threshold>High</threshold> <!-- 设置报告最低阈值为低级 -->
-                    <xmlOutput>true</xmlOutput> <!-- 输出 XML 格式报告 -->
-                    <outputDirectory>target</outputDirectory> <!-- 输出目录为 target -->
-                    <plugins>
-                        <plugin>
-                            <groupId>com.h3xstream.findsecbugs</groupId>
-                            <artifactId>findsecbugs-plugin</artifactId>
-                            <version>1.13.0</version> <!-- 配置 FindSecBugs 插件 -->
-                        </plugin>
-                    </plugins>
-                </configuration>
-            </plugin>
-
-            <!--             Dependency-Check Plugin -->
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>12.0.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal> <!-- 执行依赖检查 -->
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <nvdApiKey>${dependency-check.apiKey}</nvdApiKey> <!-- 使用你的 NVD API 密钥 -->
-                    <format>HTML</format> <!-- 设置报告格式为 XML -->
-                    <outputDirectory>${project.build.directory}</outputDirectory> <!-- 直接存到 target -->
-
-                </configuration>
-            </plugin>
-
+        <!-- Dependency-Check Plugin -->
+        <plugin>
+            <groupId>org.owasp</groupId>
+            <artifactId>dependency-check-maven</artifactId>
+            <version>12.0.2</version>
+            <executions>
+                <execution>
+                    <phase>verify</phase>  <!-- 添加执行阶段 -->
+                    <goals>
+                        <goal>check</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <nvdApiKey>${dependency-check.apiKey}</nvdApiKey>
+                <format>HTML</format>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+                <failBuildOnCVSS>7</failBuildOnCVSS>  <!-- 添加CVSS分数阈值 -->
+            </configuration>
+        </plugin>
         </plugins>
     </build>
 
