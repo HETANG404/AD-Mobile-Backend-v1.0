@@ -53,6 +53,10 @@ jobs:
           path: target/dependency-check-report.html
                 target/dependency-check-report/dependency-check-report.html
 
+
+      - name: Debug Dependency Check Report Path
+        run: ls -R target || true
+
       - name: Fail on High Vulnerabilities
         run: |
           if grep -q '<severity>Critical</severity>\|<severity>High</severity>' target/dependency-check-report.xml; then
