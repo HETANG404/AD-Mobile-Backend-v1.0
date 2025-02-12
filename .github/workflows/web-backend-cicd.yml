@@ -97,7 +97,7 @@ jobs:
           script: |
             docker stop mobile-backend || true
             docker rm mobile-backend || true
-            docker rmi mobile-backend || true
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/mobile-backend || true
 
 
             docker run -d --name mobile-backend -p 4000:4000 ${{ secrets.DOCKER_USERNAME }}/mobile-backend

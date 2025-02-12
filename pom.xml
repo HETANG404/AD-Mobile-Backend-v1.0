@@ -192,6 +192,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.tang.demo_db.DemoDbApplication</mainClass>
+                </configuration>
             </plugin>
 
             <plugin>
