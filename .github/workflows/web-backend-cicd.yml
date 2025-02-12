@@ -50,5 +50,8 @@ jobs:
           script: |
             docker stop mobile-backend || true
             docker rm mobile-backend || true
+            
+            docker image prune -af
+            
             docker pull ${{ secrets.DOCKER_USERNAME }}/mobile-backend:latest
             docker run -d --name mobile-backend -p 4000:4000 ${{ secrets.DOCKER_USERNAME }}/mobile-backend:latest
