@@ -34,6 +34,8 @@
 
     <properties>
         <java.version>17</java.version>
+        <dependency-check.apiKey>f5710338-980c-4323-b08b-2fb85b720fd9</dependency-check.apiKey>
+
     </properties>
 
     <dependencies>
@@ -125,6 +127,31 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>4.8.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h3xstream.findsecbugs</groupId>
+            <artifactId>findsecbugs-plugin</artifactId>
+            <version>1.12.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -141,6 +168,57 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- SpotBugs Plugin -->
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.8.3.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal> <!-- 执行 SpotBugs 检查 -->
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <effort>Max</effort> <!-- 设置分析力度为最大 -->
+                    <threshold>High</threshold> <!-- 设置报告最低阈值为低级 -->
+                    <xmlOutput>true</xmlOutput> <!-- 输出 XML 格式报告 -->
+                    <outputDirectory>target</outputDirectory> <!-- 输出目录为 target -->
+                    <plugins>
+                        <plugin>
+                            <groupId>com.h3xstream.findsecbugs</groupId>
+                            <artifactId>findsecbugs-plugin</artifactId>
+                            <version>1.13.0</version> <!-- 配置 FindSecBugs 插件 -->
+                        </plugin>
+                    </plugins>
+                </configuration>
+            </plugin>
+
+            <!-- Dependency-Check Plugin -->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>12.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal> <!-- 执行依赖检查 -->
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <nvdApiKey>${dependency-check.apiKey}</nvdApiKey> <!-- 使用你的 NVD API 密钥 -->
+                    <format>XML</format> <!-- 设置报告格式为 XML -->
+                    <outputDirectory>target</outputDirectory> <!-- 设置报告输出目录为 target -->
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

@@ -26,6 +26,39 @@ jobs:
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
+      # SAST配置：SpotBugs + Find Security Bugs
+      - name: Run SpotBugs Analysis
+        run: mvn spotbugs:check || true
+
+      - name: Upload SpotBugs Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-report
+          path: target/spotbugs.xml
+
+      - name: Fail on SpotBugs High Priority Issues
+        run: |
+          if grep -q '<BugInstance.*priority="1"' target/spotbugs.xml; then
+            echo "High priority issues found by SpotBugs!"
+            exit 1
+          fi
+
+      # SAST配置：依赖检查
+      - name: Upload Dependency Check Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: target/dependency-check-report.html
+
+      - name: Fail on High Vulnerabilities
+        run: |
+          if grep -q '<severity>Critical</severity>\|<severity>High</severity>' target/dependency-check-report.xml; then
+            echo "High or Critical vulnerabilities found!"
+            exit 1
+          fi
+
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 

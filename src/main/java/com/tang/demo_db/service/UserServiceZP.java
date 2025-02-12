@@ -14,6 +14,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,6 +51,11 @@ public class UserServiceZP {
     public User getUserById(Long id) {
         return userDAO.findUserById(id);
     }
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom(); // 复用 SecureRandom
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    private static final int PASSWORD_LENGTH = 10; // 设定密码长度
     /**
      * 用户登录
      */
@@ -171,14 +177,12 @@ public class UserServiceZP {
     /**
      * 生成随机密码
      */
-    private String generateRandomPassword() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder password = new StringBuilder();
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) { // 生成10位随机密码
-            password.append(chars.charAt(random.nextInt(chars.length())));
+    public static String generateRandomPassword() {
+        char[] password = new char[PASSWORD_LENGTH];
+        for (int i = 0; i < PASSWORD_LENGTH; i++) {
+            password[i] = CHARACTERS.charAt(SECURE_RANDOM.nextInt(CHARACTERS.length()));
         }
-        return password.toString();
+        return new String(password);
     }
 
     /**
