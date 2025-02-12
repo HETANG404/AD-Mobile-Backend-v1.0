@@ -24,10 +24,13 @@ jobs:
           java-version: '17'
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests
+        run: mvn clean verify -DskipTests
 
-#      - name: Run Dependency Check
-#        run: mvn dependency-check:check
+      - name: Build with Maven
+        run: mvn package -DskipTests
+
+      #      - name: Run Dependency Check
+      #        run: mvn dependency-check:check
 
 
       # SAST配置：SpotBugs + Find Security Bugs
@@ -48,23 +51,23 @@ jobs:
             exit 1
           fi
 
-#      # SAST配置：依赖检查
-#      - name: Upload Dependency Check Report
-#        if: always()
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: dependency-check-report
-#          path: |
-#            target/dependency-check-report.html
-#            target/dependency-check-report/dependency-check-report.html
-#            target/dependency-check-report/*
-#            target/*
+      #      # SAST配置：依赖检查
+      #      - name: Upload Dependency Check Report
+      #        if: always()
+      #        uses: actions/upload-artifact@v4
+      #        with:
+      #          name: dependency-check-report
+      #          path: |
+      #            target/dependency-check-report.html
+      #            target/dependency-check-report/dependency-check-report.html
+      #            target/dependency-check-report/*
+      #            target/*
 
-      
-      
 
-#      - name: Debug Dependency Check Report Path
-#        run: ls -R target || true
+
+
+      #      - name: Debug Dependency Check Report Path
+      #        run: ls -R target || true
 
       - name: Fail on High Vulnerabilities
         run: |
