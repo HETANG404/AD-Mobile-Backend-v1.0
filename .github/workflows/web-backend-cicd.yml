@@ -102,4 +102,4 @@ jobs:
 
             docker run -d --name mobile-backend -p 4000:4000 ${{ secrets.DOCKER_USERNAME }}/mobile-backend
             
-            docker start mobile-backend:latest
+            docker start mobile-backend
