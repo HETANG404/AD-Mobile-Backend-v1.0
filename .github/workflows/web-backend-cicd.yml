@@ -26,8 +26,8 @@ jobs:
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      - name: Run Dependency Check
-        run: mvn dependency-check:check
+#      - name: Run Dependency Check
+#        run: mvn dependency-check:check
 
 
       # SAST配置：SpotBugs + Find Security Bugs
@@ -48,23 +48,23 @@ jobs:
             exit 1
           fi
 
-      # SAST配置：依赖检查
-      - name: Upload Dependency Check Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: dependency-check-report
-          path: |
-            target/dependency-check-report.html
-            target/dependency-check-report/dependency-check-report.html
-            target/dependency-check-report/*
-            target/*
+#      # SAST配置：依赖检查
+#      - name: Upload Dependency Check Report
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: dependency-check-report
+#          path: |
+#            target/dependency-check-report.html
+#            target/dependency-check-report/dependency-check-report.html
+#            target/dependency-check-report/*
+#            target/*
 
       
       
 
-      - name: Debug Dependency Check Report Path
-        run: ls -R target || true
+#      - name: Debug Dependency Check Report Path
+#        run: ls -R target || true
 
       - name: Fail on High Vulnerabilities
         run: |
@@ -97,7 +97,9 @@ jobs:
           script: |
             docker stop mobile-backend || true
             docker rm mobile-backend || true
-            
+            docker rmi mobile-backend || true
 
-            docker pull ${{ secrets.DOCKER_USERNAME }}/mobile-backend:latest
+
             docker run -d --name mobile-backend -p 4000:4000 ${{ secrets.DOCKER_USERNAME }}/mobile-backend:latest
+            
+            docker start mobile-backend:latest

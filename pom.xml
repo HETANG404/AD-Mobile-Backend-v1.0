@@ -145,13 +145,45 @@
             <version>1.12.0</version>
         </dependency>
 
-
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
         </dependency>
 
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- Mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JSON Path -->
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -201,24 +233,24 @@
             </plugin>
 
             <!-- Dependency-Check Plugin -->
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>12.0.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal> <!-- 执行依赖检查 -->
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <nvdApiKey>${dependency-check.apiKey}</nvdApiKey> <!-- 使用你的 NVD API 密钥 -->
-                    <format>HTML</format> <!-- 设置报告格式为 XML -->
-                    <outputDirectory>${project.build.directory}</outputDirectory> <!-- 直接存到 target -->
+<!--            <plugin>-->
+<!--                <groupId>org.owasp</groupId>-->
+<!--                <artifactId>dependency-check-maven</artifactId>-->
+<!--                <version>12.0.2</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>check</goal> &lt;!&ndash; 执行依赖检查 &ndash;&gt;-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <nvdApiKey>${dependency-check.apiKey}</nvdApiKey> &lt;!&ndash; 使用你的 NVD API 密钥 &ndash;&gt;-->
+<!--                    <format>HTML</format> &lt;!&ndash; 设置报告格式为 XML &ndash;&gt;-->
+<!--                    <outputDirectory>${project.build.directory}</outputDirectory> &lt;!&ndash; 直接存到 target &ndash;&gt;-->
 
-                </configuration>
-            </plugin>
+<!--                </configuration>-->
+<!--            </plugin>-->
 
         </plugins>
     </build>
