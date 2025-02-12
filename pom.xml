@@ -209,14 +209,14 @@
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs-maven-plugin</artifactId>
             <version>4.8.3.0</version>
-            <executions>
+<!--            <executions>-->
 <!--                <execution>-->
 <!--                    <phase>verify</phase>  &lt;!&ndash; 添加执行阶段 &ndash;&gt;-->
 <!--                    <goals>-->
 <!--                        <goal>check</goal>-->
 <!--                    </goals>-->
 <!--                </execution>-->
-            </executions>
+<!--            </executions>-->
             <configuration>
                 <effort>Max</effort>
                 <threshold>High</threshold>
