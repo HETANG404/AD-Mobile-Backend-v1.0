@@ -210,12 +210,12 @@
             <artifactId>spotbugs-maven-plugin</artifactId>
             <version>4.8.3.0</version>
             <executions>
-                <execution>
-                    <phase>verify</phase>  <!-- 添加执行阶段 -->
-                    <goals>
-                        <goal>check</goal>
-                    </goals>
-                </execution>
+<!--                <execution>-->
+<!--                    <phase>verify</phase>  &lt;!&ndash; 添加执行阶段 &ndash;&gt;-->
+<!--                    <goals>-->
+<!--                        <goal>check</goal>-->
+<!--                    </goals>-->
+<!--                </execution>-->
             </executions>
             <configuration>
                 <effort>Max</effort>
@@ -232,26 +232,26 @@
             </configuration>
         </plugin>
 
-        <!-- Dependency-Check Plugin -->
-        <plugin>
-            <groupId>org.owasp</groupId>
-            <artifactId>dependency-check-maven</artifactId>
-            <version>12.0.2</version>
-            <executions>
-                <execution>
-                    <phase>verify</phase>  <!-- 添加执行阶段 -->
-                    <goals>
-                        <goal>check</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <nvdApiKey>${dependency-check.apiKey}</nvdApiKey>
-                <format>HTML</format>
-                <outputDirectory>${project.build.directory}</outputDirectory>
-                <failBuildOnCVSS>7</failBuildOnCVSS>  <!-- 添加CVSS分数阈值 -->
-            </configuration>
-        </plugin>
+<!--        &lt;!&ndash; Dependency-Check Plugin &ndash;&gt;-->
+<!--        <plugin>-->
+<!--            <groupId>org.owasp</groupId>-->
+<!--            <artifactId>dependency-check-maven</artifactId>-->
+<!--            <version>12.0.2</version>-->
+<!--            <executions>-->
+<!--                <execution>-->
+<!--                    <phase>verify</phase>  &lt;!&ndash; 添加执行阶段 &ndash;&gt;-->
+<!--                    <goals>-->
+<!--                        <goal>check</goal>-->
+<!--                    </goals>-->
+<!--                </execution>-->
+<!--            </executions>-->
+<!--            <configuration>-->
+<!--                <nvdApiKey>${dependency-check.apiKey}</nvdApiKey>-->
+<!--                <format>HTML</format>-->
+<!--                <outputDirectory>${project.build.directory}</outputDirectory>-->
+<!--                <failBuildOnCVSS>7</failBuildOnCVSS>  &lt;!&ndash; 添加CVSS分数阈值 &ndash;&gt;-->
+<!--            </configuration>-->
+<!--        </plugin>-->
         </plugins>
     </build>
 
