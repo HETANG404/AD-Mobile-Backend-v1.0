@@ -31,21 +31,32 @@ public class RestaurantServiceZP {
     public ResponseEntity<String> fetchRecommendedRestaurants(String query) {
         return externalApiService.getRecommendations(query);
     }
+
     public void addRestaurantToFavorites(String userId, Restaurant restaurant) {
         User user = userRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new RuntimeException("用户未找到"));
 
+        // 先检查是否已收藏（通过 placeId）
+        if (favouriteRepository.existsByUserIdAndRestaurantPlaceId(Long.parseLong(userId), restaurant.getPlaceId())) {
+            return; // 已收藏，直接返回
+        }
+
+        // 如果 placeId 存在，则获取该餐厅（不重复存入）
         Restaurant savedRestaurant = restaurantRepository.findByPlaceId(restaurant.getPlaceId())
                 .orElseGet(() -> restaurantRepository.save(restaurant));
 
-        if (!favouriteRepository.existsByUserAndRestaurant(user, savedRestaurant)) {
-            Favourite favourite = new Favourite();
-            favourite.setUser(user);
-            favourite.setRestaurant(savedRestaurant);
-            favouriteRepository.save(favourite);
-        }
+//        if (!favouriteRepository.existsByUserAndRestaurant(user, savedRestaurant)) {
+//            Favourite favourite = new Favourite();
+//            favourite.setUser(user);
+//            favourite.setRestaurant(savedRestaurant);
+//            favouriteRepository.save(favourite);
+//        }
+        // 保存收藏
+        Favourite favourite = new Favourite();
+        favourite.setUser(user);
+        favourite.setRestaurant(savedRestaurant);
+        favouriteRepository.save(favourite);
     }
-
 
     public void removeRestaurantFromFavorites(String userId, String placeId) {
         User user = userRepository.findById(Long.parseLong(userId))
@@ -54,19 +65,24 @@ public class RestaurantServiceZP {
         Restaurant restaurant = restaurantRepository.findByPlaceId(placeId)
                 .orElseThrow(() -> new RuntimeException("餐厅未找到"));
 
-        favouriteRepository.deleteByUserAndRestaurant(user, restaurant);
+//        favouriteRepository.deleteByUserAndRestaurant(user, restaurant);
+        // 检查是否已收藏
+        if (!favouriteRepository.existsByUserIdAndRestaurantPlaceId(user.getId(), placeId)) {
+            return; // 该餐厅未收藏，直接返回
+        }
+
+        // 通过 userId 和 placeId 删除收藏
+        favouriteRepository.deleteByUserIdAndRestaurantPlaceId(user.getId(), placeId);
     }
+
     public List<Restaurant> getUserFavoriteRestaurants(String userId) {
         List<Favourite> favourites = favouriteDAO.findFavoritesByUserId(userId);
         return favourites.stream().map(Favourite::getRestaurant).collect(Collectors.toList());
     }
 
-
     public boolean isRestaurantFavorited(Long userId, String placeId) {
-        return favouriteRepository.existsByUserIdAndRestaurant_PlaceId(userId, placeId);
+        return favouriteRepository.existsByUserIdAndRestaurantPlaceId(userId, placeId);
     }
-
-
 
 }
 

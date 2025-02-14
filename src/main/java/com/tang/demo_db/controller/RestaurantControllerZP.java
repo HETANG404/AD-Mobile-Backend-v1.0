@@ -27,18 +27,19 @@ public class RestaurantControllerZP {
     }
 
     // 添加餐厅到收藏
-    @PostMapping("/favorite/{userId}")
+    @PostMapping("/favorite/add/{userId}")
     public ResponseEntity<String> addFavorite(@PathVariable String userId, @RequestBody  Restaurant restaurant) {
         restaurantService.addRestaurantToFavorites(userId, restaurant);
         return ResponseEntity.ok("收藏成功");
     }
 
     // 取消收藏
-    @DeleteMapping("/favorite/{userId}/{restaurantId}")
-    public ResponseEntity<String> removeFavorite(@PathVariable String userId, @PathVariable String restaurantId) {
-        restaurantService.removeRestaurantFromFavorites(userId, restaurantId);
+    @DeleteMapping("/favorite/remove/{userId}/{placeId}")
+    public ResponseEntity<String> removeFavorite(@PathVariable String userId, @PathVariable String placeId) {
+        restaurantService.removeRestaurantFromFavorites(userId, placeId);
         return ResponseEntity.ok("取消收藏成功");
     }
+
     // 获取用户收藏的餐厅
     @GetMapping("/favorites/{userId}")
     public ResponseEntity<List<Restaurant>> getFavoriteRestaurants(@PathVariable String userId) {
@@ -46,15 +47,18 @@ public class RestaurantControllerZP {
         return ResponseEntity.ok(favorites);
     }
 
-    @GetMapping("/favorite/check/{placeId}")
-    public ResponseEntity<Boolean> checkIfFavorited(HttpSession session, @PathVariable String placeId) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
-        }
-        boolean isFavorited = restaurantService.isRestaurantFavorited(user.getId(), placeId);
+    @GetMapping("/favorite/check/{placeId}/{userId}")
+    public ResponseEntity<Boolean> checkIfFavorited(@PathVariable String placeId, @PathVariable String userId) {
+//        User user = (User) session.getAttribute("user");
+//        if (user == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+//        }
+        boolean isFavorited = restaurantService.isRestaurantFavorited(Long.parseLong(userId), placeId);
         return ResponseEntity.ok(isFavorited);
     }
+
+
+
 }
 
 /*

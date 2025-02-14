@@ -10,7 +10,6 @@ import org.hibernate.annotations.Type;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "restaurant")
@@ -90,5 +89,4 @@ public class Restaurant {
         }
         return List.of(types.split(","));
     }
-
 }
