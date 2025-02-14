@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -14,7 +13,7 @@ import java.util.List;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPreference implements Serializable {
+public class UserPreference {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

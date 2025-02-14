@@ -12,5 +12,7 @@ import java.util.List;
 public interface FavouriteRepository extends JpaRepository<Favourite, Long> {
 
     boolean existsByUserAndRestaurant(User user, Restaurant restaurant);
+    boolean existsByUserIdAndRestaurantId(Long userId, long restaurantId);
+    boolean existsByUserIdAndRestaurant_PlaceId(Long userId, String placeId);
     void deleteByUserAndRestaurant(User user, Restaurant restaurant);
 }

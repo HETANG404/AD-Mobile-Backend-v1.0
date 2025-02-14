@@ -1,6 +1,7 @@
 package com.tang.demo_db.service;
 
 import com.tang.demo_db.dao.UserDAO;
+import com.tang.demo_db.dto.UserProfileDTO;
 import com.tang.demo_db.entity.*;
 import com.tang.demo_db.repository.DailyViewRepository;
 import com.tang.demo_db.repository.UserRepository;
@@ -13,8 +14,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,8 +28,6 @@ public class UserServiceZP {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private  UserDAO userDao;
     @Autowired
     private UserSessionRepository userSessionRepository;
 
@@ -51,11 +50,6 @@ public class UserServiceZP {
     public User getUserById(Long id) {
         return userDAO.findUserById(id);
     }
-
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom(); // 复用 SecureRandom
-    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    private static final int PASSWORD_LENGTH = 10; // 设定密码长度
     /**
      * 用户登录
      */
@@ -177,12 +171,14 @@ public class UserServiceZP {
     /**
      * 生成随机密码
      */
-    public static String generateRandomPassword() {
-        char[] password = new char[PASSWORD_LENGTH];
-        for (int i = 0; i < PASSWORD_LENGTH; i++) {
-            password[i] = CHARACTERS.charAt(SECURE_RANDOM.nextInt(CHARACTERS.length()));
+    private String generateRandomPassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder password = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) { // 生成10位随机密码
+            password.append(chars.charAt(random.nextInt(chars.length())));
         }
-        return new String(password);
+        return password.toString();
     }
 
     /**
@@ -216,32 +212,33 @@ public class UserServiceZP {
     /**
      * 更新用户偏好，确保字段对应，并转换前端的 pricePreference
      */
+    @Transactional
     public Preference updateUserPreferences(Long userId, String diet, List<String> cuisines, String price) {
         User user = getUserById(userId);
-
-        // 检查用户是否已有偏好设置
-        Optional<Preference> existingPreference = user.getPreferences().stream().findFirst();
-        Preference preference = existingPreference.orElse(new Preference());
-        preference.setUser(user);
-
-        // 赋默认值
-        preference.setDietPreference(diet != null ? diet : "No dietary restrictions");
-
-        // 只取第一个 cuisine
-        String firstCuisine = (cuisines != null && !cuisines.isEmpty()) ? cuisines.get(0) : "Unknown";
-        preference.setCuisinesPreference(firstCuisine);
-
-        preference.setPricePreference(convertPricePreference(price));
-
-        // 避免重复添加 Preference
-        if (existingPreference.isEmpty()) {
-            user.getPreferences().add(preference);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
         }
 
-        userDAO.updateUser(user); // 保存用户数据
+        // 检查是否已有偏好
+        List<Preference> preferences = user.getPreferences();
+        Preference preference;
 
-        return preference;
+        if (preferences == null || preferences.isEmpty()) {
+            preference = new Preference();
+            preference.setUser(user);
+            user.getPreferences().add(preference);
+        } else {
+            preference = preferences.get(0); // 只修改第一个 Preference
+        }
+
+        // 设置偏好信息
+        preference.setDietPreference(diet != null ? diet : "No dietary restrictions");
+        preference.setCuisinesPreference((cuisines != null && !cuisines.isEmpty()) ? cuisines.get(0) : "Unknown");
+        preference.setPricePreference(convertPricePreference(price));
+
+        return preference; // Hibernate 自动持久化
     }
+
 
 
     /**
@@ -270,18 +267,47 @@ public class UserServiceZP {
     }
 
 
-    public void recordDailyView(Integer searchCount) {
+    public void recordSearchCountOfDailyView(Integer searchCount) {
         LocalDate today = LocalDate.now();
 
         // 查找今天的记录
         DailyView dailyView = dailyViewRepository.findByDate(today)
                 .orElse(new DailyView(null, today, 0, 0));
 
-        // 更新 searchCount 和 loginCount
+        // 更新 searchCount
         dailyView.setSearchCount(dailyView.getSearchCount() + searchCount);
-        dailyView.setLoginCount(dailyView.getLoginCount() + 1);
 
         // 保存到数据库
         dailyViewRepository.save(dailyView);
+    }
+    public void recordLoginCountToDailyView(Integer logoutCount) {
+        LocalDate today = LocalDate.now();
+
+        // 查找今天的记录
+        DailyView dailyView = dailyViewRepository.findByDate(today)
+                .orElse(new DailyView(null, today, 0, 0));
+
+        // 更新 loginCount
+        dailyView.setLoginCount(dailyView.getLoginCount() + logoutCount);
+
+        // 保存到数据库
+        dailyViewRepository.save(dailyView);
+    }
+
+    // Get user profile by ID (or username, if needed)
+    public UserProfileDTO getUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return new UserProfileDTO(user.getUsername(), user.getEmail(), user.getAge());
+    }
+
+    // Update user profile
+    public void updateUserProfile(Long userId, UserProfileDTO userProfileDTO) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setUsername(userProfileDTO.getUsername());
+        user.setEmail(userProfileDTO.getEmail());
+        user.setAge(userProfileDTO.getAge());
+        userRepository.save(user); // Save the updated user profile
     }
 }

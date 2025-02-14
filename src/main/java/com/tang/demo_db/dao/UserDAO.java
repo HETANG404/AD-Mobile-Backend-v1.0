@@ -1,6 +1,8 @@
 package com.tang.demo_db.dao;
 
+import com.tang.demo_db.entity.Preference;
 import com.tang.demo_db.entity.User;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -24,16 +26,11 @@ public class UserDAO {
         entityManager.persist(user);
     }
 
-    public void updateUser(User user) {
-        entityManager.merge(user);
-    }
-
     public void deleteUser(Long id) {
         User user = entityManager.find(User.class, id);
         if (user != null) {
             entityManager.remove(user);
         }
     }
-
 
 }

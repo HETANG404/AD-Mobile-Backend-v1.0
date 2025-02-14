@@ -2,9 +2,13 @@ package com.tang.demo_db.controller;
 
 
 import com.tang.demo_db.entity.Restaurant;
+import com.tang.demo_db.entity.User;
 import com.tang.demo_db.service.RestaurantService;
 import com.tang.demo_db.service.RestaurantServiceZP;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RestaurantControllerZP {
 
-
-    private final RestaurantServiceZP restaurantService;
+    @Autowired
+    private RestaurantServiceZP restaurantService;
     @GetMapping("/recommend")
     public ResponseEntity<String> getRecommendedRestaurants(@RequestParam String query) {
         return restaurantService.fetchRecommendedRestaurants(query);
@@ -42,7 +46,15 @@ public class RestaurantControllerZP {
         return ResponseEntity.ok(favorites);
     }
 
-
+    @GetMapping("/favorite/check/{placeId}")
+    public ResponseEntity<Boolean> checkIfFavorited(HttpSession session, @PathVariable String placeId) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+        }
+        boolean isFavorited = restaurantService.isRestaurantFavorited(user.getId(), placeId);
+        return ResponseEntity.ok(isFavorited);
+    }
 }
 
 /*

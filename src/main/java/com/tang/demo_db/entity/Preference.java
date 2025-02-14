@@ -4,14 +4,12 @@ package com.tang.demo_db.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
-
 @Entity
 @Table(name = "preference")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Preference implements Serializable {
+public class Preference {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

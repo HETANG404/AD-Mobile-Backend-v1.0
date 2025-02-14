@@ -8,16 +8,16 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "restaurant")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Restaurant implements Serializable {
+public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -90,4 +90,5 @@ public class Restaurant implements Serializable {
         }
         return List.of(types.split(","));
     }
+
 }

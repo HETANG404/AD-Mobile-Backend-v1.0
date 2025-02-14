@@ -6,7 +6,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -51,13 +50,13 @@ public class SecurityConfig {
 //        http.cors(Customizer.withDefaults());
 
         //这个就是有报错，不要改
-
-        http.csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // 适用于 Web 应用
-        );
-        http.cors(cors -> cors.configurationSource((corsConfigurationSource())));
+        http.csrf().disable();
+        http.cors(cors->cors.configurationSource((corsConfigurationSource())));
         return http.build();
     }
+
+
+
 
 
 }

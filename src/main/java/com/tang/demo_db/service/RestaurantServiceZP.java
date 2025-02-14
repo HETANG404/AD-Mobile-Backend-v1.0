@@ -61,5 +61,12 @@ public class RestaurantServiceZP {
         return favourites.stream().map(Favourite::getRestaurant).collect(Collectors.toList());
     }
 
+
+    public boolean isRestaurantFavorited(Long userId, String placeId) {
+        return favouriteRepository.existsByUserIdAndRestaurant_PlaceId(userId, placeId);
+    }
+
+
+
 }
 

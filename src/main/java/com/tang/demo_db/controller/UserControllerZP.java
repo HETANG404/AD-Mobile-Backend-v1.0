@@ -2,11 +2,10 @@ package com.tang.demo_db.controller;
 
 import com.tang.demo_db.dto.ChangePasswordRequestDTO;
 import com.tang.demo_db.dto.LoginRequest;
-import com.tang.demo_db.dto.LogoutRequest;
 import com.tang.demo_db.dto.RegisterRequestDTO;
+import com.tang.demo_db.dto.UserProfileDTO;
 import com.tang.demo_db.entity.Preference;
 import com.tang.demo_db.entity.User;
-import com.tang.demo_db.entity.UserPreference;
 import com.tang.demo_db.entity.UserSession;
 import com.tang.demo_db.repository.UserSessionRepository;
 import com.tang.demo_db.service.UserServiceZP;
@@ -41,7 +40,8 @@ public class UserControllerZP {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         String ipAddress = getClientIpAddress(); // 获取当前设备的IP地址
-
+        User loggedInUser = (User) session.getAttribute("user");
+        System.out.println(loggedInUser);
         if (session.getAttribute("user") != null) {
             return ResponseEntity.status(HttpStatus.OK).body("Already logged in");
         }
@@ -61,6 +61,9 @@ public class UserControllerZP {
             userData.put("isNew", false);  // 登录的用户通常不是新用户，除非你有逻辑判断
 
             response.put("user", userData);
+
+            userService.recordLoginCountToDailyView(1);
+
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Invalid username or password"));
@@ -123,31 +126,34 @@ public class UserControllerZP {
      * 用户登出
      */
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session, @RequestBody LogoutRequest logoutRequest) {
+    public ResponseEntity<?> logout(HttpSession session) {
         // 获取当前用户
         User user = (User) session.getAttribute("user");
 
         if (user != null) {
-
             List<UserSession> userSessions = userSessionRepository.findByUser(user);
             if (!userSessions.isEmpty()) {
                 userSessionRepository.deleteAll(userSessions);
                 System.out.println("删除用户会话: " + userSessions.size() + " 个");
             }
-            // 更新 DailyView
-            userService.recordDailyView(logoutRequest.getSearchCount());
+
+            System.out.println("用户 " + user.getId() + " 退出登录");
+
+//            userService.recordLoginCountToDailyView(1);
 
             // 清除 Session
             session.invalidate();
 
+
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(Collections.singletonMap("message", "Logged out successfully, search count recorded."));
+                    .body(Collections.singletonMap("message", "Logged out successfully."));
         }
 
-        // 如果用户没有登录（session 为 null）
+        // 如果用户没有登录（session 为空）
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Collections.singletonMap("error", "No user is currently logged in"));
     }
+
 
 
 
@@ -160,39 +166,43 @@ public class UserControllerZP {
         // 检查用户是否已登录
         User loggedInUser = (User) session.getAttribute("user");
         if (loggedInUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not logged in");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("message", "User is not logged in"));
         }
+
+        System.out.println(changePasswordRequestDTO.getOldPassword());
+        System.out.println(changePasswordRequestDTO.getNewPassword());
 
         // 原密码验证
         boolean isOldPasswordValid = userService.checkOldPassword(loggedInUser, changePasswordRequestDTO.getOldPassword());
         if (!isOldPasswordValid) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect old password");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Incorrect old password"));
         }
 
         // 新密码与确认密码检查
         if (!changePasswordRequestDTO.getNewPassword().equals(changePasswordRequestDTO.getConfirmPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New passwords do not match");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "New passwords do not match"));
         }
 
         // 新密码验证
         boolean isNewPasswordValid = isValidPassword(changePasswordRequestDTO.getNewPassword());
         if (!isNewPasswordValid) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New password does not meet the required criteria");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "New password does not meet the required criteria"));
         }
 
         // 确保新密码与原密码不同
         if (changePasswordRequestDTO.getOldPassword().equals(changePasswordRequestDTO.getNewPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New password cannot be the same as the old password");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "New password cannot be the same as the old password"));
         }
 
         // 修改密码
         boolean isPasswordChanged = userService.changePassword(loggedInUser, changePasswordRequestDTO.getNewPassword());
         if (isPasswordChanged) {
-            return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully");
+            return ResponseEntity.status(HttpStatus.OK).body(Collections.singletonMap("message", "Password changed successfully"));
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to change password");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Failed to change password"));
         }
     }
+
 
 
     private boolean isValidPassword(String password) {
@@ -255,6 +265,40 @@ public class UserControllerZP {
         }
     }
 
+    //每次点击搜索，记录一次当天的搜索次数到dailyview
+    @PostMapping("/updateSearchCountOfDailyView")
+    public ResponseEntity<?> updateSearchCountOfDailyView(@RequestBody Map<String, Integer> requestData) {
+        if (!requestData.containsKey("searchCount")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", "Missing searchCount"));
+        }
+        int searchCount = requestData.get("searchCount");
+        userService.recordSearchCountOfDailyView(searchCount);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap("message", "Search count recorded successfully."));
+    }
 
+    // Endpoint to get user profile
+    // Endpoint to get user profile
+    @GetMapping("/fetchProfile/{userId}")
+    public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable Long userId) {
+        try {
+            UserProfileDTO userProfile = userService.getUserProfile(userId);
+            return ResponseEntity.ok(userProfile);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);  // Respond with 404 if user is not found
+        }
+    }
+
+    // Endpoint to update user profile
+    @PutMapping("/updateProfile/{userId}")
+    public ResponseEntity<Void> updateUserProfile(@PathVariable Long userId, @RequestBody UserProfileDTO userProfileDTO) {
+        try {
+            userService.updateUserProfile(userId, userProfileDTO);
+            return ResponseEntity.noContent().build();  // Respond with 204 No Content after a successful update
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  // Respond with 404 if user is not found
+        }
+    }
 
 }

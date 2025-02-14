@@ -29,11 +29,11 @@ public class UserController {
         userService.createUser(user);
     }
 
-    @PutMapping("/{id}")
+    /*@PutMapping("/{id}")
     public void updateUser(@PathVariable Long id, @RequestBody User user) {
         user.setId(id);
         userService.updateUser(user);
-    }
+    }*/
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {

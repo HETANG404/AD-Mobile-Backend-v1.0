@@ -4,21 +4,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
-
 @Entity
 @Table(name = "favourite")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Favourite implements Serializable {
+public class Favourite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-//    @JsonIgnore
+    @JsonIgnore
     private User user;
 
     @ManyToOne

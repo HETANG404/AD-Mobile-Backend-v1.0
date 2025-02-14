@@ -27,9 +27,9 @@ public class UserService {
         userDAO.saveUser(user);
     }
 
-    public void updateUser(User user) {
+    /*public void updateUser(User user) {
         userDAO.updateUser(user);
-    }
+    }*/
 
     public void deleteUser(Long id) {
         userDAO.deleteUser(id);
